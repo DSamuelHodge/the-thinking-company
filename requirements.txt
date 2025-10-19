@@ -1,3 +1,6 @@
 fastmcp
 requests
 google-genai
+pytest
+pytest-mock
+pytest-asyncio
