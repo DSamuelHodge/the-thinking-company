@@ -53,12 +53,15 @@ def send_email(to: str | None, subject: str, html: str, from_email: str = FROM_E
         return f"Error: {response.status_code} - {response.text}"
 
 if __name__ == "__main__":
-    #  Remove or comment out the one-off test block in __main__ when you switch to production.
-    # Test sending a single email to verified recipient
-    to_addr = os.getenv("RECIPIENT", "dshodge2020@outlook.com")
-    print(f"Sending test email to {to_addr}")
-    # send_email is a FastMCP FunctionTool; call its `.fn` to invoke the actual function
-    test_result = send_email.fn(to_addr, "Test Resend Email", "<p>This is a test email for Resend connector.</p>")
-    print(f"Test result: {test_result}")
+    # Optional: run a one-off test when RUN_RESEND_TEST is set to '1'.
+    # This avoids sending test emails during normal server runs.
+    run_test = os.getenv("RUN_RESEND_TEST", "0") == "1"
+    if run_test:
+        to_addr = os.getenv("RECIPIENT", "dshodge2020@outlook.com")
+        print(f"Sending test email to {to_addr}")
+        # send_email is a FastMCP FunctionTool; call its `.fn` to invoke the actual function
+        test_result = send_email.fn(to_addr, "Test Resend Email", "<p>This is a test email for Resend connector.</p>")
+        print(f"Test result: {test_result}")
+
     # Start the FastMCP server
     mcp.run()

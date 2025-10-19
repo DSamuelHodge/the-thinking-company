@@ -53,8 +53,8 @@ def search_issues(jql: str) -> str:
     # try falling back to the traditional search endpoint which accepts a jql query param.
     # Examples of statuses to try fallback on: 410 (gone), 400 (bad request), 404 (not found)
     if resp.status_code in (410, 400, 404):
+        get_url = f"{JIRA_BASE_URL.rstrip('/')}/rest/api/3/search"
         try:
-            get_url = f"{JIRA_BASE_URL.rstrip('/')}/rest/api/3/search"
             params = {"jql": jql}
             get_headers = {"Accept": "application/json", "Authorization": auth_header}
             get_resp = requests.get(get_url, headers=get_headers, params=params, timeout=20)
