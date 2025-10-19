@@ -31,7 +31,8 @@ def search_pages(query: str, space_key: str | None = None) -> str:
     if not CONFLUENCE_API_TOKEN or CONFLUENCE_API_TOKEN == "your-api-token":
         raise ValueError('CONFLUENCE_API_TOKEN is not set or using placeholder')
 
-    url = f"{CONFLUENCE_BASE_URL.rstrip('/')}/rest/api/content/search"
+    # Confluence Cloud API path: /wiki/rest/api/ (not just /rest/api/)
+    url = f"{CONFLUENCE_BASE_URL.rstrip('/')}/wiki/rest/api/content/search"
     headers = {
         "Accept": "application/json",
         "Authorization": get_basic_auth_header(CONFLUENCE_USERNAME, CONFLUENCE_API_TOKEN)
@@ -60,7 +61,7 @@ def create_page(space_key: str, title: str, content: str) -> str:
     if not CONFLUENCE_API_TOKEN or CONFLUENCE_API_TOKEN == "your-api-token":
         raise ValueError('CONFLUENCE_API_TOKEN is not set or using placeholder')
 
-    url = f"{CONFLUENCE_BASE_URL.rstrip('/')}/rest/api/content"
+    url = f"{CONFLUENCE_BASE_URL.rstrip('/')}/wiki/rest/api/content"
     headers = {
         "Accept": "application/json",
         "Content-Type": "application/json",
@@ -100,7 +101,7 @@ def get_page(page_id: str) -> str:
     if not CONFLUENCE_API_TOKEN or CONFLUENCE_API_TOKEN == "your-api-token":
         raise ValueError('CONFLUENCE_API_TOKEN is not set or using placeholder')
 
-    url = f"{CONFLUENCE_BASE_URL.rstrip('/')}/rest/api/content/{page_id}?expand=body.storage"
+    url = f"{CONFLUENCE_BASE_URL.rstrip('/')}/wiki/rest/api/content/{page_id}?expand=body.storage"
     headers = {
         "Accept": "application/json",
         "Authorization": get_basic_auth_header(CONFLUENCE_USERNAME, CONFLUENCE_API_TOKEN)
