@@ -16,11 +16,11 @@ def get_event_types() -> str:
     if not CAL_API_KEY:
         raise ValueError('CAL_API_KEY is not set')
 
-    url = "https://api.cal.com/v1/event-types"
-    # Some Cal.com setups accept either Bearer or x-api-key; include both safely.
+    url = "https://api.cal.com/v2/event-types"
+    # Cal.com API v2 requires cal-api-version header
     headers = {
-        "Authorization": f"Bearer {CAL_API_KEY}",
-        "x-api-key": CAL_API_KEY,
+        "Authorization": CAL_API_KEY,
+        "cal-api-version": "2024-08-06",
         "Content-Type": "application/json"
     }
     try:
@@ -42,10 +42,10 @@ def create_booking(event_type_id: int, start_time: str, attendee_email: str, att
     if not CAL_API_KEY:
         raise ValueError('CAL_API_KEY is not set')
 
-    url = "https://api.cal.com/v1/bookings"
+    url = "https://api.cal.com/v2/bookings"
     headers = {
-        "Authorization": f"Bearer {CAL_API_KEY}",
-        "x-api-key": CAL_API_KEY,
+        "Authorization": CAL_API_KEY,
+        "cal-api-version": "2024-08-06",
         "Content-Type": "application/json"
     }
     payload = {
@@ -75,10 +75,10 @@ def get_availability(event_type_id: int, date_from: str, date_to: str) -> str:
     if not CAL_API_KEY:
         raise ValueError('CAL_API_KEY is not set')
 
-    url = f"https://api.cal.com/v1/event-types/{event_type_id}/availability"
+    url = f"https://api.cal.com/v2/event-types/{event_type_id}/availability"
     headers = {
-        "Authorization": f"Bearer {CAL_API_KEY}",
-        "x-api-key": CAL_API_KEY,
+        "Authorization": CAL_API_KEY,
+        "cal-api-version": "2024-08-06",
         "Content-Type": "application/json"
     }
     params = {"dateFrom": date_from, "dateTo": date_to}
