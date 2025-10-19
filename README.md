@@ -140,3 +140,49 @@ After running the above command, an HTML coverage report will be generated in th
    ```
 
 This will open a detailed, interactive coverage report in your default web browser.
+
+## Testing MCP servers with Postman
+
+FastMCP supports multiple transports. The default 'streamable-http' transport is optimized for streaming responses and uses text/event-stream. When using a streaming transport, clients must send an Accept header that includes both "application/json" and "text/event-stream". Postman doesn't automatically set this header, which can cause the "Not Acceptable" error:
+
+```json
+{
+   "jsonrpc": "2.0",
+   "id": "server-error",
+   "error": {
+      "code": -32600,
+      "message": "Not Acceptable: Client must accept both application/json and text/event-stream"
+   }
+}
+```
+
+To call the streamable endpoint from Postman, add an explicit header:
+
+Key: Accept
+Value: application/json, text/event-stream
+
+Or, use the included non-streaming JSON endpoint which is easier to test with Postman. Start the JSON runner:
+
+```powershell
+# Port 8001
+python run_jira_json.py
+```
+
+Then send a POST to:
+
+```
+http://127.0.0.1:8001/mcp-json
+```
+
+Example request body (JSON):
+
+```json
+{
+   "tool": "search_issues",
+   "args": {
+      "jql": "project = TEST"
+   }
+}
+```
+
+The response will be a JSON object containing either a "result" or an "error" field.
