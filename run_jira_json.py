@@ -20,12 +20,24 @@ async def handle_mcp(request: Request):
     data = await request.json()
     tool_name = data.get('tool')
     args = data.get('args', {}) or {}
-    tool = mcp.get_tool(tool_name)
+    tool = await mcp.get_tool(tool_name)
     if tool is None:
         return JSONResponse({"error": f"Tool '{tool_name}' not found"}, status_code=404)
+    import inspect, asyncio
     try:
-        # For FastMCP tools, call the underlying function (tool.fn) synchronously
-        result = tool.fn(**args)
+        # For FastMCP tools, call the underlying function (tool.fn).
+        # It may be a coroutine (async) or a regular function.
+        # FastMCP FunctionTool exposes the callable at `.fn`.
+        fn = getattr(tool, 'fn', None) or (tool if callable(tool) else None)
+        # Debug logging
+        print('DEBUG: tool type=', type(tool), 'repr=', repr(tool))
+        print('DEBUG: fn resolved type=', type(fn), 'callable=', callable(fn))
+        if fn is None or not callable(fn):
+            return JSONResponse({"error": "Invalid tool function"}, status_code=500)
+        if inspect.iscoroutinefunction(fn):
+            result = await fn(**args)
+        else:
+            result = fn(**args)
         # Ensure result is JSON serializable
         try:
             json.dumps(result)

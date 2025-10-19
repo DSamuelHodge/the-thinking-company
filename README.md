@@ -186,3 +186,5 @@ Example request body (JSON):
 ```
 
 The response will be a JSON object containing either a "result" or an "error" field.
+
+Note: The JIRA tools require the `JIRA_BASE_URL`, `JIRA_USERNAME`, and `JIRA_API_TOKEN` environment variables to be set. If you don't set them, the JSON runner will return an authentication error.
