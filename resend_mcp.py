@@ -5,13 +5,16 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+# Default sender from verified domain
+FROM_EMAIL = os.getenv("FROM_EMAIL", "onboarding@resend.dev")
+
 # Placeholder for API key - replace with your actual Resend API key
 RESEND_API_KEY = os.getenv("RESEND_API_KEY")
 
 mcp = FastMCP("Resend MCP Server")
 
 @mcp.tool
-def send_email(to: str | None, subject: str, html: str, from_email: str = "onboarding@resend.dev") -> str:
+def send_email(to: str | None, subject: str, html: str, from_email: str = FROM_EMAIL) -> str:
     """Send an email using Resend API."""
     url = "https://api.resend.com/emails"
     headers = {
@@ -50,4 +53,12 @@ def send_email(to: str | None, subject: str, html: str, from_email: str = "onboa
         return f"Error: {response.status_code} - {response.text}"
 
 if __name__ == "__main__":
+    #  Remove or comment out the one-off test block in __main__ when you switch to production.
+    # Test sending a single email to verified recipient
+    to_addr = os.getenv("RECIPIENT", "dshodge2020@outlook.com")
+    print(f"Sending test email to {to_addr}")
+    # send_email is a FastMCP FunctionTool; call its `.fn` to invoke the actual function
+    test_result = send_email.fn(to_addr, "Test Resend Email", "<p>This is a test email for Resend connector.</p>")
+    print(f"Test result: {test_result}")
+    # Start the FastMCP server
     mcp.run()
