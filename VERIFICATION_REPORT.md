@@ -80,29 +80,38 @@
 
 ---
 
-### ⚠️ Cal.com - Invalid API Key
-**Status:** `401 - No apiKey provided`
+### ✅ Cal.com - Working!
+**Status:** `200 OK - Event Types Retrieved`
 
 ```json
 {
-  "message": "No apiKey provided"
+  "status": "success",
+  "data": {
+    "eventTypeGroups": [
+      {
+        "teamId": null,
+        "bookerUrl": "https://cal.com",
+        "membershipRole": null,
+        "profile": {
+          "slug": "thinkingcompany",
+          "name": "Derrick Hodge",
+          "image": "https://app.cal.com/api/avatar/..."
+        },
+        "eventTypes": [...]
+      }
+    ]
+  }
 }
 ```
 
 **What this means:**
-- Cal.com API is reachable
-- API key is not set or is invalid
-- **Action:** Verify in `.env`:
-  1. `CAL_API_KEY` is set and not empty
-  2. API key is valid (obtain from Cal.com dashboard: https://app.cal.com/settings/admin)
-  3. Check that the key has appropriate permissions
+- ✅ Cal.com API v2 is reachable and authenticated
+- ✅ API key is valid and properly formatted
+- ✅ Connector correctly uses required `cal-api-version` header
+- ✅ Retrieved full event type groups with user profile and booking URLs
+- **Action:** No action needed — Cal.com is working as designed!
 
-**Quick fix:** Update `.env`:
-```env
-CAL_API_KEY=your-valid-calcom-api-key
-```
-
-Then re-run: `python verify_connectors.py`
+**Note:** The fix was to upgrade from API v1 to v2 endpoints and include the required `cal-api-version: 2024-08-06` header. The API key should be passed directly in the `Authorization` header (not as a Bearer token).
 
 ---
 
@@ -146,7 +155,7 @@ Start-Process htmlcov/index.html
 | **JIRA** | ✅ Working | API migration handled, fallback logic working |
 | **Resend** | ✅ Working | Domain verification needed for production emails |
 | **Confluence** | ✅ Working | Correct endpoint path confirmed (/wiki/rest/api/) |
-| **Cal.com** | ⚠️ Config Issue | Verify API key is set and valid |
+| **Cal.com** | ✅ Working | API v2 with cal-api-version header working |
 | **Postman Collection** | ✅ Ready | Test assertions included for all connectors |
 | **JSON Endpoint** | ✅ Ready | Run `python run_jira_json.py` to start |
 | **Pytest Tests** | ✅ Ready | Run `pytest` to execute |
