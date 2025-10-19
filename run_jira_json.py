@@ -6,6 +6,9 @@ import uvicorn
 import json
 
 from jira_mcp import mcp
+from fastmcp.exceptions import NotFoundError
+from dotenv import load_dotenv
+load_dotenv()
 
 app = Starlette()
 
@@ -20,9 +23,10 @@ async def handle_mcp(request: Request):
     data = await request.json()
     tool_name = data.get('tool')
     args = data.get('args', {}) or {}
-    tool = await mcp.get_tool(tool_name)
-    if tool is None:
-        return JSONResponse({"error": f"Tool '{tool_name}' not found"}, status_code=404)
+    try:
+        tool = await mcp.get_tool(tool_name)
+    except NotFoundError as e:
+        return JSONResponse({"error": str(e)}, status_code=404)
     import inspect, asyncio
     try:
         # For FastMCP tools, call the underlying function (tool.fn).
@@ -32,6 +36,13 @@ async def handle_mcp(request: Request):
         # Debug logging
         print('DEBUG: tool type=', type(tool), 'repr=', repr(tool))
         print('DEBUG: fn resolved type=', type(fn), 'callable=', callable(fn))
+        # Validate required parameters if present
+        params = getattr(tool, 'parameters', None) or {}
+        required = params.get('required', []) if isinstance(params, dict) else []
+        if required:
+            missing = [r for r in required if r not in args]
+            if missing:
+                return JSONResponse({"error": f"Missing required parameter(s): {missing}"}, status_code=400)
         if fn is None or not callable(fn):
             return JSONResponse({"error": "Invalid tool function"}, status_code=500)
         if inspect.iscoroutinefunction(fn):

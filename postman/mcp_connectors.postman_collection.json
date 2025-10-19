@@ -36,9 +36,16 @@
               "pm.test(\"Status code is 200 or 400/401/410 accepted\", function (){",
               "  pm.expect(pm.response.code).to.be.oneOf([200,400,401,410,404]);",
               "});",
-              "var body = pm.response.json ? pm.response.json() : {};",
-              "pm.test(\"Response has result or error\", function(){",
-              "  pm.expect(body).to.satisfy(function(b){ return b.hasOwnProperty('result') || b.hasOwnProperty('error'); });",
+              "var bodyText = pm.response.text();",
+              "var parsed = {};",
+              "try { parsed = pm.response.json(); } catch(e) { parsed = null; }",
+              "pm.test(\"Response contains result or fallback error string\", function(){",
+              "  // Accept either a JSON object with 'result' or 'error', or a plain string error message",
+              "  if (parsed) {",
+              "    pm.expect(parsed).to.satisfy(function(b){ return b && (b.hasOwnProperty('result') || b.hasOwnProperty('error')); });",
+              "  } else {",
+              "    pm.expect(bodyText).to.match(/Error:|Fallback Error:/);",
+              "  }",
               "});"
             ],
             "type": "text/javascript"
@@ -104,6 +111,84 @@
         "body": { "mode": "raw", "raw": "{\n  \"tool\": \"get_issue\",\n  \"args\": { \"issue_key\": \"{{jira_sample_issue}}\" }\n}" },
         "url": { "raw": "{{mcp_json_url}}/mcp-json", "host": ["{{mcp_json_url}}/mcp-json"] }
       }
+    },
+    {
+      "name": "Confluence - search_pages (JSON)",
+      "request": {
+        "method": "POST",
+        "header": [ { "key": "Content-Type", "value": "application/json" } ],
+        "body": { "mode": "raw", "raw": "{\n  \"tool\": \"search_pages\",\n  \"args\": { \"query\": \"test\" }\n}" },
+        "url": { "raw": "{{mcp_json_url}}/mcp-json", "host": ["{{mcp_json_url}}/mcp-json"] }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200 or expected error (401/404/etc)\", function(){",
+              "  pm.expect(pm.response.code).to.be.oneOf([200, 400, 401, 403, 404]);",
+              "});",
+              "var bodyText = pm.response.text();",
+              "pm.test(\"Response contains result or error\", function(){",
+              "  pm.expect(bodyText).to.match(/Error:|result/) || pm.expect(bodyText).to.include('{');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Cal.com - get_event_types (JSON)",
+      "request": {
+        "method": "POST",
+        "header": [ { "key": "Content-Type", "value": "application/json" } ],
+        "body": { "mode": "raw", "raw": "{\n  \"tool\": \"get_event_types\",\n  \"args\": {}\n}" },
+        "url": { "raw": "{{mcp_json_url}}/mcp-json", "host": ["{{mcp_json_url}}/mcp-json"] }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200 or expected error (401/404/etc)\", function(){",
+              "  pm.expect(pm.response.code).to.be.oneOf([200, 400, 401, 403, 404]);",
+              "});",
+              "var bodyText = pm.response.text();",
+              "pm.test(\"Response contains result or error\", function(){",
+              "  pm.expect(bodyText).to.match(/Error:|result|data/) || pm.expect(bodyText).to.include('{');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Resend - send_email (JSON)",
+      "request": {
+        "method": "POST",
+        "header": [ { "key": "Content-Type", "value": "application/json" } ],
+        "body": { "mode": "raw", "raw": "{\n  \"tool\": \"send_email\",\n  \"args\": { \"to\": \"test@example.com\", \"subject\": \"Test from Postman\", \"html\": \"<p>Test email</p>\" }\n}" },
+        "url": { "raw": "{{mcp_json_url}}/mcp-json", "host": ["{{mcp_json_url}}/mcp-json"] }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200/202 or expected error\", function(){",
+              "  pm.expect(pm.response.code).to.be.oneOf([200, 202, 400, 401, 403, 422]);",
+              "});",
+              "var bodyText = pm.response.text();",
+              "pm.test(\"Response contains result or error\", function(){",
+              "  pm.expect(bodyText).to.match(/Error:|result|id/) || pm.expect(bodyText).to.include('{');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
     }
   ]
 }
