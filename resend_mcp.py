@@ -3,7 +3,7 @@ import requests
 import os
 
 # Placeholder for API key - replace with your actual Resend API key
-RESEND_API_KEY = os.getenv("RESEND_API_KEY", "your-resend-api-key")
+RESEND_API_KEY = os.getenv("RESEND_API_KEY")
 
 mcp = FastMCP("Resend MCP Server")
 

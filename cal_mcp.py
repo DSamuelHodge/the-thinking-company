@@ -3,7 +3,7 @@ import requests
 import os
 
 # Placeholder for API key - replace with your actual Cal.com API key
-CAL_API_KEY = os.getenv("CAL_API_KEY", "your-cal-api-key")
+CAL_API_KEY = os.getenv("CAL_API_KEY")
 
 mcp = FastMCP("Cal.com MCP Server")
 

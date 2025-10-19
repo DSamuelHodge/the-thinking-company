@@ -1,11 +1,20 @@
 from fastmcp import FastMCP
 import requests
 import os
+import base64
 
 # Placeholders for credentials - replace with your actual values
-JIRA_BASE_URL = os.getenv("JIRA_BASE_URL", "https://your-domain.atlassian.net")
-JIRA_USERNAME = os.getenv("JIRA_USERNAME", "your-email@example.com")
-JIRA_API_TOKEN = os.getenv("JIRA_API_TOKEN", "your-api-token")
+JIRA_BASE_URL = os.getenv("JIRA_BASE_URL")
+JIRA_USERNAME = os.getenv("JIRA_USERNAME")
+JIRA_API_TOKEN = os.getenv("JIRA_API_TOKEN")
+
+def get_basic_auth_header(username: str | None, token: str | None) -> str:
+    """Generate Basic Auth header value."""
+    if not username or not token:
+        raise ValueError("Username and token are required for authentication")
+    credentials = f"{username}:{token}"
+    encoded = base64.b64encode(credentials.encode()).decode()
+    return f"Basic {encoded}"
 
 mcp = FastMCP("JIRA MCP Server")
 
@@ -15,7 +24,7 @@ def search_issues(jql: str) -> str:
     url = f"{JIRA_BASE_URL}/rest/api/3/search"
     headers = {
         "Accept": "application/json",
-        "Authorization": f"Basic {requests.auth._basic_auth_str(JIRA_USERNAME, JIRA_API_TOKEN)}"
+        "Authorization": get_basic_auth_header(JIRA_USERNAME, JIRA_API_TOKEN)
     }
     params = {"jql": jql}
     response = requests.get(url, headers=headers, params=params)
@@ -31,7 +40,7 @@ def create_issue(project_key: str, summary: str, description: str, issue_type: s
     headers = {
         "Accept": "application/json",
         "Content-Type": "application/json",
-        "Authorization": f"Basic {requests.auth._basic_auth_str(JIRA_USERNAME, JIRA_API_TOKEN)}"
+        "Authorization": get_basic_auth_header(JIRA_USERNAME, JIRA_API_TOKEN)
     }
     payload = {
         "fields": {
@@ -53,7 +62,7 @@ def get_issue(issue_key: str) -> str:
     url = f"{JIRA_BASE_URL}/rest/api/3/issue/{issue_key}"
     headers = {
         "Accept": "application/json",
-        "Authorization": f"Basic {requests.auth._basic_auth_str(JIRA_USERNAME, JIRA_API_TOKEN)}"
+        "Authorization": get_basic_auth_header(JIRA_USERNAME, JIRA_API_TOKEN)
     }
     response = requests.get(url, headers=headers)
     if response.status_code == 200:
