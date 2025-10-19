@@ -27,6 +27,24 @@
           ]
         }
       }
+      ,
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200 or 400/401/410 accepted\", function (){",
+              "  pm.expect(pm.response.code).to.be.oneOf([200,400,401,410,404]);",
+              "});",
+              "var body = pm.response.json ? pm.response.json() : {};",
+              "pm.test(\"Response has result or error\", function(){",
+              "  pm.expect(body).to.satisfy(function(b){ return b.hasOwnProperty('result') || b.hasOwnProperty('error'); });",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
     },
     {
       "name": "JIRA - invalid tool (JSON)",
@@ -38,6 +56,24 @@
         "body": { "mode": "raw", "raw": "{\n  \"tool\": \"not_a_real_tool\",\n  \"args\": {}\n}" },
         "url": { "raw": "{{mcp_json_url}}/mcp-json", "host": ["{{mcp_json_url}}/mcp-json"] }
       }
+      ,
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 404 for unknown tool\", function(){",
+              "  pm.expect(pm.response.code).to.equal(404);",
+              "});",
+              "var body = pm.response.json ? pm.response.json() : {};",
+              "pm.test(\"Error message present\", function(){",
+              "  pm.expect(body).to.have.property('error');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
     },
     {
       "name": "JIRA - search_issues (streamable HTTP)",

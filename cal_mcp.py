@@ -1,6 +1,9 @@
 from fastmcp import FastMCP
 import requests
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Placeholder for API key - replace with your actual Cal.com API key
 CAL_API_KEY = os.getenv("CAL_API_KEY")

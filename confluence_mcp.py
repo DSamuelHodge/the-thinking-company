@@ -2,6 +2,9 @@ from fastmcp import FastMCP
 import requests
 import os
 import base64
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Placeholders for credentials - replace with your actual values
 CONFLUENCE_BASE_URL = os.getenv("CONFLUENCE_BASE_URL", "https://your-domain.atlassian.net")

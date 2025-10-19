@@ -2,6 +2,9 @@ from fastmcp import FastMCP
 import requests
 import os
 import base64
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Placeholders for credentials - replace with your actual values
 JIRA_BASE_URL = os.getenv("JIRA_BASE_URL")
@@ -21,13 +24,17 @@ mcp = FastMCP("JIRA MCP Server")
 @mcp.tool
 def search_issues(jql: str) -> str:
     """Search for JIRA issues using JQL query."""
-    url = f"{JIRA_BASE_URL}/rest/api/3/search"
+    # New endpoint: /rest/api/3/search/jql expects a JSON body with `query`
+    if not JIRA_BASE_URL:
+        raise ValueError('JIRA_BASE_URL is not set')
+    url = f"{JIRA_BASE_URL.rstrip('/')}/rest/api/3/search/jql"
     headers = {
         "Accept": "application/json",
+        "Content-Type": "application/json",
         "Authorization": get_basic_auth_header(JIRA_USERNAME, JIRA_API_TOKEN)
     }
-    params = {"jql": jql}
-    response = requests.get(url, headers=headers, params=params)
+    payload = {"query": jql}
+    response = requests.post(url, headers=headers, json=payload)
     if response.status_code == 200:
         return response.json()
     else:
