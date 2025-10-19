@@ -52,29 +52,31 @@
 
 ---
 
-### ⚠️ Confluence - Configuration Issue
-**Status:** `404 - Dead Link`
+### ✅ Confluence - Working!
+**Status:** `200 OK - Search Results`
 
-```
-Error: 404 - <!DOCTYPE html><html lang="en">... Oops, you've found a dead link. - JIRA
+```json
+{
+  "results": [],
+  "start": 0,
+  "limit": 25,
+  "size": 0,
+  "_links": {
+    "base": "https://hodgedomain.atlassian.net/wiki",
+    "context": "/wiki",
+    "self": "https://hodgedomain.atlassian.net/wiki/rest/api/content/search?cql=text+~+%27test%27"
+  }
+}
 ```
 
 **What this means:**
-- API is reachable (no auth errors)
-- Endpoint path is incorrect or resource doesn't exist
-- **Action:** Verify in `.env`:
-  1. `CONFLUENCE_BASE_URL` should be `https://your-domain.atlassian.net` (same as JIRA)
-  2. Ensure you have access to the Confluence instance
-  3. Check that the API token has Confluence permissions (may be separate from JIRA)
+- ✅ Confluence API is reachable and authenticated
+- ✅ Connector is properly formatting CQL queries
+- ✅ Search returned a valid response (empty results for test query is expected)
+- ✅ All pagination and metadata included
+- **Action:** No action needed — Confluence is working as designed!
 
-**Quick fix:** Update `.env`:
-```env
-CONFLUENCE_BASE_URL=https://your-domain.atlassian.net
-CONFLUENCE_USERNAME=your-email@example.com
-CONFLUENCE_API_TOKEN=your-confluence-api-token
-```
-
-Then re-run: `python verify_connectors.py`
+**Note:** The fix was to use the correct endpoint path: `/wiki/rest/api/content/search` instead of just `/rest/api/content/search`. Confluence Cloud API requires the `/wiki` prefix.
 
 ---
 
@@ -143,7 +145,7 @@ Start-Process htmlcov/index.html
 |-----------|--------|-------|
 | **JIRA** | ✅ Working | API migration handled, fallback logic working |
 | **Resend** | ✅ Working | Domain verification needed for production emails |
-| **Confluence** | ⚠️ Config Issue | Verify base URL and permissions |
+| **Confluence** | ✅ Working | Correct endpoint path confirmed (/wiki/rest/api/) |
 | **Cal.com** | ⚠️ Config Issue | Verify API key is set and valid |
 | **Postman Collection** | ✅ Ready | Test assertions included for all connectors |
 | **JSON Endpoint** | ✅ Ready | Run `python run_jira_json.py` to start |
