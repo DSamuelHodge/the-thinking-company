@@ -60,4 +60,13 @@ async def handle_mcp(request: Request):
 
 
 if __name__ == '__main__':
-    uvicorn.run(app, host='127.0.0.1', port=8001)
+    import sys
+    try:
+        print("Starting JSON MCP endpoint on http://127.0.0.1:8001/mcp-json", file=sys.stderr)
+        uvicorn.run(app, host='127.0.0.1', port=8001, log_level='info')
+    except KeyboardInterrupt:
+        print("\nShutting down...", file=sys.stderr)
+        sys.exit(0)
+    except Exception as e:
+        print(f"Error starting server: {e}", file=sys.stderr)
+        sys.exit(1)
