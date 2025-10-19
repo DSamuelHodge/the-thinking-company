@@ -93,30 +93,50 @@ This project provides MCP (Model Context Protocol) servers built with FastMCP fo
 - Authentication: API key, OAuth client credentials, managed user access tokens.
 - Key features: Bookings, event types, schedules, availability, webhooks, etc.
 
-## Notes
 
-- All credentials are loaded from environment variables with placeholder defaults.
-- Replace the placeholder values with your actual credentials.
-- Each MCP server runs independently and can be connected to an MCP client.
-- The servers use FastMCP for simplified MCP implementation.
+## Running Tests
 
-## Testing
-
-This repository includes unit tests for each MCP connector using pytest. Tests mock HTTP requests and do not perform real network requests.
-
-To run the tests:
+This project uses `pytest` for testing. To run all tests:
 
 ```bash
-pip install -r requirements.txt
-pytest -v
+pytest
 ```
 
-What the tests cover:
-- JIRA: search, create, and get issue behaviors, and auth header generation
-- Confluence: search pages, create page, get page, and auth header generation
-- Resend: sending emails and handling common errors
-- Cal.com: event types, bookings, and availability responses
+## Test Coverage
 
-Notes:
-- Tests use the `unittest.mock` module to patch `requests` calls and simulate API responses.
-- Update or add tests in `tests/` when you add features or change behavior.
+Test coverage is measured using `pytest-cov`.
+
+### Install Coverage Tools
+
+If you haven't already, install `pytest-cov`:
+
+```bash
+pip install pytest-cov
+```
+
+### Run Tests with Coverage
+
+To run all tests and generate a coverage report (including an HTML report):
+
+```bash
+pytest --cov=./ --cov-report=html --cov-report=term-missing -q
+```
+
+### View the Coverage Report
+
+After running the above command, an HTML coverage report will be generated in the `htmlcov` directory. To view it:
+
+- **On Windows:**
+   ```powershell
+   Start-Process htmlcov\index.html
+   ```
+- **On macOS:**
+   ```bash
+   open htmlcov/index.html
+   ```
+- **On Linux:**
+   ```bash
+   xdg-open htmlcov/index.html
+   ```
+
+This will open a detailed, interactive coverage report in your default web browser.
