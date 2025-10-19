@@ -188,3 +188,45 @@ Example request body (JSON):
 The response will be a JSON object containing either a "result" or an "error" field.
 
 Note: The JIRA tools require the `JIRA_BASE_URL`, `JIRA_USERNAME`, and `JIRA_API_TOKEN` environment variables to be set. If you don't set them, the JSON runner will return an authentication error.
+
+## Troubleshooting
+
+### Verification Script Output
+
+The `verify_connectors.py` script exercises all connectors with read-only calls to verify they are callable and connected:
+
+```bash
+python verify_connectors.py
+```
+
+**Expected Output Analysis:**
+
+- **JIRA**: Shows "Fallback Error: 410" → JIRA API deprecated the old endpoint and suggests migration to `/rest/api/3/search/jql`. The connector tries the new endpoint first and falls back gracefully. This is normal.
+  - **Fix**: Ensure `JIRA_BASE_URL`, `JIRA_USERNAME`, `JIRA_API_TOKEN` are set in `.env` and that the account has permissions. The code already handles the migration correctly.
+
+- **Confluence**: Shows "Error: 404" → The search endpoint was not found or the credentials/permissions are incorrect.
+  - **Fix**: Verify `CONFLUENCE_BASE_URL` (e.g., `https://your-domain.atlassian.net`), `CONFLUENCE_USERNAME`, and `CONFLUENCE_API_TOKEN` in `.env`. Ensure your Confluence instance is accessible and that your API token has read permissions.
+
+- **Cal.com**: Shows "Error: 401 - No apiKey provided" → The API key is not recognized.
+  - **Fix**: Verify `CAL_API_KEY` is set in `.env` and is a valid Cal.com API key. Check Cal.com documentation for the correct API key format and endpoint. The connector now includes both Bearer and x-api-key headers for compatibility.
+
+- **Resend**: Shows "Error: missing or invalid recipient (to)" → The recipient email is not set.
+  - **Fix**: Set `RECIPIENT` in `.env` to a valid email address (e.g., `RECIPIENT=user@example.com`), or ensure the `verify_connectors.py` script passes a valid `to` parameter. Note: The `send_email` function will attempt to send an actual email; use a test email address or verify RESEND_API_KEY is set to avoid unexpected email sends.
+
+### Running Postman Tests
+
+1. Start the JSON runner:
+   ```powershell
+   python run_jira_json.py
+   ```
+
+2. In Postman, import the collection:
+   - File → Import → Select `postman/mcp_connectors.postman_collection.json`
+
+3. Set the environment variables in Postman:
+   - Click "Environments" → Select `postman/mcp_connectors.postman_environment.json` (or create/import)
+   - Ensure `mcp_json_url` is set to `http://127.0.0.1:8001`
+
+4. Run requests and observe test results:
+   - Each request includes automated assertions (Postman Tests tab)
+   - Tests verify expected HTTP status codes and response structure
