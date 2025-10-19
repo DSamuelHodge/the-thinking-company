@@ -1,0 +1,73 @@
+{
+  "info": {
+    "name": "MCP Connectors - Postman Collection",
+    "_postman_id": "mcp-connectors-collection",
+    "description": "Collection to test MCP connectors (JIRA, Confluence, Resend, Cal.com). Uses JSON runner (/mcp-json) and streamable HTTP (/mcp). Do NOT store secrets in this file.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "JIRA - search_issues (JSON)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"tool\": \"search_issues\",\n  \"args\": { \"jql\": \"project = {{jira_project}}\" }\n}"
+        },
+        "url": {
+          "raw": "{{mcp_json_url}}/mcp-json",
+          "host": [
+            "{{mcp_json_url}}/mcp-json"
+          ]
+        }
+      }
+    },
+    {
+      "name": "JIRA - invalid tool (JSON)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": { "mode": "raw", "raw": "{\n  \"tool\": \"not_a_real_tool\",\n  \"args\": {}\n}" },
+        "url": { "raw": "{{mcp_json_url}}/mcp-json", "host": ["{{mcp_json_url}}/mcp-json"] }
+      }
+    },
+    {
+      "name": "JIRA - search_issues (streamable HTTP)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Accept", "value": "application/json, text/event-stream" }
+        ],
+        "body": { "mode": "raw", "raw": "{\n  \"tool\": \"search_issues\",\n  \"args\": { \"jql\": \"project = {{jira_project}}\" }\n}" },
+        "url": { "raw": "{{mcp_http_url}}/mcp", "host": ["{{mcp_http_url}}/mcp"] }
+      }
+    },
+    {
+      "name": "JIRA - create_issue (JSON)",
+      "request": {
+        "method": "POST",
+        "header": [ { "key": "Content-Type", "value": "application/json" } ],
+        "body": { "mode": "raw", "raw": "{\n  \"tool\": \"create_issue\",\n  \"args\": { \"project_key\": \"{{jira_project}}\", \"summary\": \"Test from Postman\", \"description\": \"Created by Postman collection\" }\n}" },
+        "url": { "raw": "{{mcp_json_url}}/mcp-json", "host": ["{{mcp_json_url}}/mcp-json"] }
+      }
+    },
+    {
+      "name": "JIRA - get_issue (JSON)",
+      "request": {
+        "method": "POST",
+        "header": [ { "key": "Content-Type", "value": "application/json" } ],
+        "body": { "mode": "raw", "raw": "{\n  \"tool\": \"get_issue\",\n  \"args\": { \"issue_key\": \"{{jira_sample_issue}}\" }\n}" },
+        "url": { "raw": "{{mcp_json_url}}/mcp-json", "host": ["{{mcp_json_url}}/mcp-json"] }
+      }
+    }
+  ]
+}
